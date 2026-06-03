@@ -58,8 +58,8 @@ export default function MentalAgeDisplay({
 
       {/* Hint when no age yet */}
       {!hasAge && (
-        <p className="mt-2 text-white/25 text-xs">
-          向下滑动，输入你的实际年龄查看差距
+        <p className="mt-2 text-white/20 text-xs">
+          输入实际年龄，查看差距分析 ↓
         </p>
       )}
     </div>

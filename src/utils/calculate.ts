@@ -380,12 +380,112 @@ export function generateAgeComparison(
     ageAwareDimAnalysis(d.dimension, d.mentalAge, chronologicalAge)
   );
 
+  // ---- fun gap description ----
+  const funGap = generateFunGap(deviation, baseResult.mentalAge, chronologicalAge, sorted);
+
+  // ---- answer pattern insights ----
+  const patternInsights = detectPatterns(baseResult, deviation, spread);
+
   return {
     chronologicalAge,
     deviation,
+    funGap,
+    patternInsights,
     detailedAnalysis: detailed,
     insight,
     advice,
     dimensionAnalyses: dimAnalyses,
   };
+}
+
+// ============================================================
+// 趣味年龄差距解读
+// ============================================================
+function generateFunGap(
+  deviation: number,
+  mentalAge: number,
+  chronologicalAge: number,
+  sorted: DimensionResult[]
+): string {
+  const absDev = Math.abs(deviation);
+  const highest = sorted[0];
+
+  if (absDev <= 4) {
+    return `你的心理年龄（${mentalAge} 岁）和实际年龄几乎同步——你不是"显老"也不是"装嫩"，你就是你，刚刚好的你。这也意味着你的成长节奏和大多数同龄人是同步的，各个维度的心理发展比较均衡。`;
+  }
+
+  if (deviation < -4 && deviation >= -12) {
+    const lines = [
+      `虽然身份证上写着 ${chronologicalAge} 岁，但你的内心似乎停留在 ${mentalAge} 岁——这绝对不是坏事。心理学研究发现，心态年轻的人通常更快乐、更有创造力，也更容易在变化中找到机会。`,
+      `你的心理年龄比实际年龄年轻 ${absDev} 岁。在这个人人都在焦虑"变老"的时代，你天生就拥有大家梦寐以求的东西——一颗不老的心。不过提醒一下：偶尔看看银行卡余额和体检报告也不是坏事。`,
+    ];
+    return lines[Math.abs(deviation) % 2];
+  }
+
+  if (deviation < -12) {
+    return `天呐！你的心理年龄（${mentalAge} 岁）比实际年龄年轻了 ${absDev} 岁。你大概是朋友圈里那个永远充满活力、永远在尝试新鲜事物的人。虽然有时可能会被说"不够成熟"，但说实话——那些说你的人，可能只是羡慕你还没丢掉对世界的好奇心。`;
+  }
+
+  if (deviation > 4 && deviation <= 12) {
+    return `你的心理年龄比实际年龄成熟 ${absDev} 岁——在 ${chronologicalAge} 岁的身体里，住着一个 ${mentalAge} 岁的灵魂。你大概是那种"让人安心的存在"：朋友遇到麻烦第一个想到的就是你。这份成熟可能是经历给你的礼物，但也别忘了，偶尔做一次"小孩"也没关系。`;
+  }
+
+  // deviation > 12
+  return `你的心理年龄（${mentalAge} 岁）远超实际年龄（${chronologicalAge} 岁），领先了整整 ${absDev} 岁。你一定经历过同龄人没有经历过的事情，让你比他们更早地看透了很多。在「${highest.label}」这个维度上尤其突出。你有着不怒自威的气场，但也请记得——人生不是只有"成长"一个方向，"放松"和"快乐"同样重要。`;
+}
+
+// ============================================================
+// 答题模式洞察
+// ============================================================
+function detectPatterns(
+  baseResult: { dimensions: DimensionResult[]; mentalAge: number },
+  deviation: number,
+  spread: number
+): string[] {
+  const patterns: string[] = [];
+  const dims = baseResult.dimensions;
+  const sorted = [...dims].sort((a, b) => b.mentalAge - a.mentalAge);
+
+  // Pattern 1: all dimensions consistently high or low
+  const allHigh = dims.every((d) => d.mentalAge >= 45);
+  const allLow = dims.every((d) => d.mentalAge <= 25);
+  const allMid = dims.every((d) => d.mentalAge >= 26 && d.mentalAge <= 44);
+
+  if (allHigh) {
+    patterns.push('你在四个维度上的心理年龄都处于高位，说明你的"成熟"是全方位的——从思维方式到生活习惯，都透着一股稳重。这不是一朝一夕形成的，而是你长期自我打磨的结果。');
+  } else if (allLow) {
+    patterns.push('你的四个维度都偏向年轻化，这不是"不成熟"，而是一种难得的"保鲜力"。在大多数成年人逐渐变得保守和谨慎的过程中，你保持了开放、灵活和好奇——这恰恰是当今时代最稀缺的素质。');
+  } else if (allMid) {
+    patterns.push('你的四个维度都处于中间地带，这让你在各种场合都能自如切换——该认真时能认真，该放松时能放松。你是那种"让人觉得舒服"的人，不极端、不偏激。');
+  }
+
+  // Pattern 2: large spread between dimensions
+  if (spread >= 20) {
+    const highest = sorted[0];
+    const lowest = sorted[sorted.length - 1];
+    patterns.push(
+      `一个有趣的发现：你身上最"成熟"的维度（${highest.label}，${highest.mentalAge} 岁）和最"年轻"的维度（${lowest.label}，${lowest.mentalAge} 岁）相差了 ${spread} 岁。这说明你并不是一个"单一心理年龄"的人——在某些方面你像个老灵魂，在另一些方面你又像个少年。这种内在的复杂性，恰恰是一个丰富而有趣的人的标志。`
+    );
+  }
+
+  // Pattern 3: deviation direction insight
+  if (deviation > 15) {
+    patterns.push(
+      '你的心理年龄远超实际年龄，这种"超龄成熟"往往意味着你在比较年轻的时候就经历了需要承担重大责任的情境——也许是家庭、也许是工作。这种经历让你比同龄人走得更快，但也要注意：长期"端着"会很累，记得给自己设置"放松日"。'
+    );
+  } else if (deviation < -15) {
+    patterns.push(
+      '你的心理年龄比实际年龄年轻很多——这通常不是一个"问题"，而是一种"天赋"。很多创新者和艺术家都拥有这种"大龄儿童"的特质。不过，在某些需要"成年人思维"的领域（比如理财、健康管理），可以适当给自己加一些结构和约束。'
+    );
+  }
+
+  // Ensure we have at least 1
+  if (patterns.length === 0) {
+    patterns.push(
+      '你的四个维度发展比较均衡，没有一个极端突出或落后的领域。这种平衡在当今社会其实很珍贵——它意味着你不太容易在某一方面出现盲区。'
+    );
+  }
+
+  // Limit to 3
+  return patterns.slice(0, 3);
 }

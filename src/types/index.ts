@@ -53,6 +53,8 @@ export interface BaseResult {
 export interface AgeComparison {
   chronologicalAge: number;
   deviation: number;
+  funGap: string;           // 年龄差距的趣味解读
+  patternInsights: string[]; // 基于答题模式的具体洞察（1-3 条）
   detailedAnalysis: string;
   insight: string;
   advice: string;
