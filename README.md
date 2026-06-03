@@ -384,3 +384,17 @@ src/
 ## 📄 许可
 
 MIT License
+
+---
+
+## 🔄 更新服务
+
+代码有更新时，在服务器上执行：
+
+```bash
+cd /home/yj/code/mental-age-test
+git pull
+npm install        # 如有新依赖
+npm run build
+sudo systemctl restart mental-age-test
+```

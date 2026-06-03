@@ -1,19 +1,25 @@
 import type { Question, Dimension, DimensionBranch } from '../types';
 
 // ============================================================
-// 所有题目以 ID → Question 的 Map 形式存储
-// 每维度结构：4 基准题 + 4 高分分支题 + 4 低分分支题
-// 评分：1=偏年轻/冲动/直觉, 5=偏成熟/克制/系统
+// 题库：80 题（每维度 20 题）
+//   4 基准 + 8 高分分支 + 8 低分分支
+// 每维度 4 个子主题，每个子主题在每分支池有 2 题
+// 分支时每子主题随机选 1 题，保证覆盖面
 // ============================================================
+
+// 子主题标签
+const Cog = { flex: '认知灵活性', verif: '信息验证', refl: '自我反思', curio: '求知开放' } as const;
+const Emo = { regul: '情绪调节', empat: '共情能力', aware: '自我觉察', resil: '心理韧性' } as const;
+const Soc = { resp: '责任担当', confl: '冲突处理', gene: '代际关怀', bound: '关系边界' } as const;
+const Lif = { plan: '未来规划', heal: '健康管理', risk: '风险评估', grow: '终身成长' } as const;
 
 const questionDefs: Question[] = [
 
-  // ═══════════════════════════════════════════════════════
-  // 维度一：认知年龄 — 基准题（4 题，所有人回答）
-  // ═══════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════
+  // 🧠 认知年龄 — 基准题 4 题
+  // ═══════════════════════════════════════════════════
   {
-    id: 'cog-1',
-    dimension: 'cognitive',
+    id: 'cog-1', dimension: 'cognitive', subtopic: Cog.flex,
     text: '你正在处理一件棘手的事，试了几种方法都没成功，这时你通常会？',
     options: [
       { score: 1, text: '感到沮丧，先放下去做别的', emoji: '😤' },
@@ -24,8 +30,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'cog-2',
-    dimension: 'cognitive',
+    id: 'cog-2', dimension: 'cognitive', subtopic: Cog.verif,
     text: '在网上看到一则令人惊讶的说法时，你通常会？',
     options: [
       { score: 1, text: '觉得有道理就转发分享', emoji: '📤' },
@@ -36,8 +41,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'cog-3',
-    dimension: 'cognitive',
+    id: 'cog-3', dimension: 'cognitive', subtopic: Cog.refl,
     text: '回顾过去自己做错的一个决定，你现在的感受更接近？',
     options: [
       { score: 1, text: '不太愿意回想，过去就过去了', emoji: '🙈' },
@@ -48,8 +52,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'cog-4',
-    dimension: 'cognitive',
+    id: 'cog-4', dimension: 'cognitive', subtopic: Cog.curio,
     text: '你需要学习一项全新技能来完成工作，你通常如何入手？',
     options: [
       { score: 1, text: '直接上手试，遇到问题再说', emoji: '🚀' },
@@ -60,10 +63,9 @@ const questionDefs: Question[] = [
     ],
   },
 
-  // 认知年龄 — 高分分支题（基准总分 ≥ 13 时使用，深入考察系统性思维）
+  // ── 认知高分分支 8 题（flex/2, verif/2, refl/2, curio/2）──
   {
-    id: 'cog-h1',
-    dimension: 'cognitive',
+    id: 'cog-h1', dimension: 'cognitive', subtopic: Cog.verif,
     text: '你的观点在会议上被多数人反对，但你坚信自己是对的，你会？',
     options: [
       { score: 1, text: '坚持己见，争论到底', emoji: '🥊' },
@@ -74,8 +76,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'cog-h2',
-    dimension: 'cognitive',
+    id: 'cog-h2', dimension: 'cognitive', subtopic: Cog.flex,
     text: '面对一个"没有标准答案"的复杂社会问题，你的思考习惯是？',
     options: [
       { score: 1, text: '凭直觉站队，支持听起来有道理的一方', emoji: '👂' },
@@ -86,9 +87,8 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'cog-h3',
-    dimension: 'cognitive',
-    text: '你做了一个决策，结果不好，你觉得主要原因是运气差，这时有人指出你决策本身有逻辑漏洞，你会？',
+    id: 'cog-h3', dimension: 'cognitive', subtopic: Cog.refl,
+    text: '你做了个决策结果不好，你觉得主要是运气差，这时有人指出你决策本身有逻辑漏洞，你会？',
     options: [
       { score: 1, text: '觉得对方不了解情况，不太想听', emoji: '🙉' },
       { score: 2, text: '听对方说完，但内心不太认同', emoji: '😐' },
@@ -98,8 +98,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'cog-h4',
-    dimension: 'cognitive',
+    id: 'cog-h4', dimension: 'cognitive', subtopic: Cog.curio,
     text: '两个你信任的专家对同一件事给出了截然相反的建议，你会？',
     options: [
       { score: 1, text: '选那个听起来更顺耳的', emoji: '👂' },
@@ -109,11 +108,55 @@ const questionDefs: Question[] = [
       { score: 5, text: '综合双方的观点，形成自己的独立判断', emoji: '🧩' },
     ],
   },
-
-  // 认知年龄 — 低分分支题（基准总分 < 13 时使用，鼓励反思和深度思考）
+  // ── 认知高分分支 新增 4 题 ──
   {
-    id: 'cog-l1',
-    dimension: 'cognitive',
+    id: 'cog-h5', dimension: 'cognitive', subtopic: Cog.verif,
+    text: '你看到一个热搜话题引发了激烈争吵，两条对立观点都有大量支持者，你会？',
+    options: [
+      { score: 1, text: '站自己第一感觉认同的一边', emoji: '👆' },
+      { score: 2, text: '读几篇支持自己看法的文章来确认', emoji: '📖' },
+      { score: 3, text: '有意识地阅读双方的论证再形成看法', emoji: '⚖️' },
+      { score: 4, text: '先寻找双方都认可的基础事实，再看分歧在哪', emoji: '🔍' },
+      { score: 5, text: '在没有充分信息前，可以保持"暂不下结论"的状态', emoji: '⏸️' },
+    ],
+  },
+  {
+    id: 'cog-h6', dimension: 'cognitive', subtopic: Cog.flex,
+    text: '你一直用某种方法做某件事，效果还行。有人建议你换一种完全不同的方式，你会？',
+    options: [
+      { score: 1, text: '"我一直都这么做，挺好的"', emoji: '🙅' },
+      { score: 2, text: '礼貌听听，但不太可能真的去改', emoji: '👂' },
+      { score: 3, text: '先在小范围试试新方法，看效果如何', emoji: '🧪' },
+      { score: 4, text: '认真比较新旧方法的优劣再做决定', emoji: '📊' },
+      { score: 5, text: '乐于尝试新方法，习惯本身不是目的、效果才是', emoji: '⚡' },
+    ],
+  },
+  {
+    id: 'cog-h7', dimension: 'cognitive', subtopic: Cog.refl,
+    text: '完成一个大项目后，团队成员都在庆祝，你通常会？',
+    options: [
+      { score: 1, text: '全心庆祝，不要想工作的事', emoji: '🎉' },
+      { score: 2, text: '庆祝为主，但也隐约想想哪里还能更好', emoji: '🤔' },
+      { score: 3, text: '庆祝之后找时间自己回顾一下得失', emoji: '📝' },
+      { score: 4, text: '组织团队一起做一次正式的项目复盘', emoji: '📋' },
+      { score: 5, text: '复盘之后将经验提炼为团队可复用的流程改进', emoji: '🔄' },
+    ],
+  },
+  {
+    id: 'cog-h8', dimension: 'cognitive', subtopic: Cog.curio,
+    text: '一次偶然的交谈中，你发现自己的某个"常识"其实是错的，你的感受是？',
+    options: [
+      { score: 1, text: '有点尴尬，下意识想岔开话题', emoji: '😅' },
+      { score: 2, text: '承认错了但不太深究原因', emoji: '🤷' },
+      { score: 3, text: '追问对方这个正确信息的来源', emoji: '❓' },
+      { score: 4, text: '回去后自己去查证，纠正自己的认知', emoji: '🔍' },
+      { score: 5, text: '觉得兴奋——发现自己的盲区是扩展认知边界的好机会', emoji: '🌟' },
+    ],
+  },
+
+  // ── 认知低分分支 8 题（flex/2, verif/2, refl/2, curio/2）──
+  {
+    id: 'cog-l1', dimension: 'cognitive', subtopic: Cog.curio,
     text: '有人推荐你读一本和你观点完全相反的书，你会？',
     options: [
       { score: 1, text: '不感兴趣，不想浪费时间', emoji: '🙅' },
@@ -124,8 +167,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'cog-l2',
-    dimension: 'cognitive',
+    id: 'cog-l2', dimension: 'cognitive', subtopic: Cog.verif,
     text: '有人用一个你从没听过的概念反驳你的观点，你的反应是？',
     options: [
       { score: 1, text: '跳过这个概念，继续坚持自己的观点', emoji: '⏭️' },
@@ -136,8 +178,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'cog-l3',
-    dimension: 'cognitive',
+    id: 'cog-l3', dimension: 'cognitive', subtopic: Cog.refl,
     text: '做完一件重要的事之后，你会花时间复盘吗？',
     options: [
       { score: 1, text: '几乎不复盘，做完就完了', emoji: '🏁' },
@@ -148,8 +189,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'cog-l4',
-    dimension: 'cognitive',
+    id: 'cog-l4', dimension: 'cognitive', subtopic: Cog.flex,
     text: '别人指出你某个习惯性的思维方式有问题，你会？',
     options: [
       { score: 1, text: '"我一直这么想的，没什么问题"', emoji: '🤷' },
@@ -159,13 +199,57 @@ const questionDefs: Question[] = [
       { score: 5, text: '有意识地尝试用不同的思维方式来看同一个问题', emoji: '🔄' },
     ],
   },
-
-  // ═══════════════════════════════════════════════════════
-  // 维度二：情感年龄 — 基准题（4 题）
-  // ═══════════════════════════════════════════════════════
+  // ── 认知低分分支 新增 4 题 ──
   {
-    id: 'emo-1',
-    dimension: 'emotional',
+    id: 'cog-l5', dimension: 'cognitive', subtopic: Cog.curio,
+    text: '你发现了一个自己完全不了解的新领域（比如区块链、基因编辑），你的反应是？',
+    options: [
+      { score: 1, text: '离我太远，不需要了解', emoji: '🏃' },
+      { score: 2, text: '看个科普视频了解一下大概', emoji: '📺' },
+      { score: 3, text: '对这个领域产生了好奇，会多找几篇资料看看', emoji: '🔍' },
+      { score: 4, text: '尝试理解它的核心原理而非只是记住结论', emoji: '🧩' },
+      { score: 5, text: '思考这个领域的思维方式是否可以迁移到自己所在的领域', emoji: '🔗' },
+    ],
+  },
+  {
+    id: 'cog-l6', dimension: 'cognitive', subtopic: Cog.verif,
+    text: '一个朋友转发了条消息说"某食品致癌"，你会怎么反应？',
+    options: [
+      { score: 1, text: '宁可信其有，马上转发提醒家人', emoji: '⚠️' },
+      { score: 2, text: '心里有点慌，但等等看有没有更多人讨论', emoji: '😟' },
+      { score: 3, text: '问转发的人这个说法的来源', emoji: '❓' },
+      { score: 4, text: '自己去查权威机构（比如 WHO、疾控中心）的说法', emoji: '🔬' },
+      { score: 5, text: '查询原始研究，分辨"相关"和"因果"的区别', emoji: '📊' },
+    ],
+  },
+  {
+    id: 'cog-l7', dimension: 'cognitive', subtopic: Cog.refl,
+    text: '你花了很多时间做了一个决定，回头看其实可以有更好的选择，你的心态是？',
+    options: [
+      { score: 1, text: '后悔也没用，不要想太多', emoji: '🤷' },
+      { score: 2, text: '觉得自己当时太傻了', emoji: '😅' },
+      { score: 3, text: '接受"没有人能永远做出最优选择"', emoji: '☮️' },
+      { score: 4, text: '分析自己当时忽略了哪些信息，下次避免', emoji: '📝' },
+      { score: 5, text: '把每次"次优选择"当作优化自己决策系统的一次迭代', emoji: '🔄' },
+    ],
+  },
+  {
+    id: 'cog-l8', dimension: 'cognitive', subtopic: Cog.flex,
+    text: '你有机会参加一个和你专业完全无关的讲座，你会？',
+    options: [
+      { score: 1, text: '不感兴趣，不去了', emoji: '🙅' },
+      { score: 2, text: '如果有朋友一起去就去', emoji: '👥' },
+      { score: 3, text: '去看看也无妨，说不定有收获', emoji: '🤷' },
+      { score: 4, text: '觉得跨界也许有意外启发，主动参加', emoji: '💡' },
+      { score: 5, text: '经常主动接触不同领域——创新的突破点往往在学科交叉处', emoji: '🌐' },
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════
+  // 💙 情感年龄 — 基准题 4 题
+  // ═══════════════════════════════════════════════════
+  {
+    id: 'emo-1', dimension: 'emotional', subtopic: Emo.regul,
     text: '发生了一件让你非常生气的事，在情绪最强烈的那一刻，你通常会？',
     options: [
       { score: 1, text: '直接发泄出来，喊出来或摔东西', emoji: '💢' },
@@ -176,8 +260,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'emo-2',
-    dimension: 'emotional',
+    id: 'emo-2', dimension: 'emotional', subtopic: Emo.empat,
     text: '有人对你说了一句让你心里很不舒服的话，事后你通常会？',
     options: [
       { score: 1, text: '反复回想那句话，越想越气', emoji: '🔄' },
@@ -188,8 +271,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'emo-3',
-    dimension: 'emotional',
+    id: 'emo-3', dimension: 'emotional', subtopic: Emo.aware,
     text: '多种负面情绪（焦虑、烦躁、沮丧）同时涌上来时，你的状态是？',
     options: [
       { score: 1, text: '被情绪淹没，大脑一片混乱', emoji: '🌪️' },
@@ -200,8 +282,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'emo-4',
-    dimension: 'emotional',
+    id: 'emo-4', dimension: 'emotional', subtopic: Emo.resil,
     text: '朋友在你面前崩溃大哭，诉说困境，你的反应更接近？',
     options: [
       { score: 1, text: '坐立不安，不知道该怎么办', emoji: '😰' },
@@ -212,10 +293,9 @@ const questionDefs: Question[] = [
     ],
   },
 
-  // 情感年龄 — 高分分支题（深入考察情绪调节策略）
+  // ── 情感高分分支 8 题（regul/2, empat/2, aware/2, resil/2）──
   {
-    id: 'emo-h1',
-    dimension: 'emotional',
+    id: 'emo-h1', dimension: 'emotional', subtopic: Emo.resil,
     text: '你花了很多心思准备的方案被直接否决了，你的心态是？',
     options: [
       { score: 1, text: '情绪崩溃，觉得自己的努力被否定了', emoji: '😭' },
@@ -226,8 +306,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'emo-h2',
-    dimension: 'emotional',
+    id: 'emo-h2', dimension: 'emotional', subtopic: Emo.regul,
     text: '你和伴侣/好友因为一件小事产生了冷战，已经两天没说话了，你会？',
     options: [
       { score: 1, text: '等对方先开口，自己绝不先示弱', emoji: '🧱' },
@@ -238,8 +317,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'emo-h3',
-    dimension: 'emotional',
+    id: 'emo-h3', dimension: 'emotional', subtopic: Emo.empat,
     text: '你正在专注工作，旁边的人不断催促打扰，你通常会？',
     options: [
       { score: 1, text: '直接发火："能不能别催了！"', emoji: '🔥' },
@@ -250,8 +328,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'emo-h4',
-    dimension: 'emotional',
+    id: 'emo-h4', dimension: 'emotional', subtopic: Emo.aware,
     text: '等待一个重要结果（体检、面试、考核）的那几天，你通常？',
     options: [
       { score: 1, text: '焦虑难安，反复检查手机和邮箱', emoji: '📱' },
@@ -261,11 +338,55 @@ const questionDefs: Question[] = [
       { score: 5, text: '接受不确定性是生活的一部分，做好两手准备坦然等待', emoji: '☮️' },
     ],
   },
-
-  // 情感年龄 — 低分分支题（引导情绪觉察）
+  // ── 情感高分分支 新增 4 题 ──
   {
-    id: 'emo-l1',
-    dimension: 'emotional',
+    id: 'emo-h5', dimension: 'emotional', subtopic: Emo.resil,
+    text: '你为一个人付出了很多，对方却似乎并不领情，你会？',
+    options: [
+      { score: 1, text: '觉得自己被利用了，非常愤怒', emoji: '😡' },
+      { score: 2, text: '很受伤，以后不再对这个人好了', emoji: '💔' },
+      { score: 3, text: '和对方沟通一下自己的感受', emoji: '💬' },
+      { score: 4, text: '反思自己的付出是否确实是对方需要的', emoji: '🤔' },
+      { score: 5, text: '调整自己的付出方式——不求回报但也要保护自己不内耗', emoji: '⚖️' },
+    ],
+  },
+  {
+    id: 'emo-h6', dimension: 'emotional', subtopic: Emo.regul,
+    text: '你突然收到一个让自己非常失望的消息，而接下来还有一个重要会议需要你发言，你会？',
+    options: [
+      { score: 1, text: '完全无法集中注意力，会议表现大幅下降', emoji: '😞' },
+      { score: 2, text: '勉强撑过去，但全程心不在焉', emoji: '😐' },
+      { score: 3, text: '给自己 5 分钟消化情绪，然后切换回工作状态', emoji: '⏱️' },
+      { score: 4, text: '把失望暂时"存"起来，告诉自己"先处理好眼前的事再来想这件事"', emoji: '📦' },
+      { score: 5, text: '接受当下的双重状态——可以同时感到失望和保持专业', emoji: '☯️' },
+    ],
+  },
+  {
+    id: 'emo-h7', dimension: 'emotional', subtopic: Emo.empat,
+    text: '一个同事最近工作状态明显下滑、经常出错，你会？',
+    options: [
+      { score: 1, text: '觉得他不认真，应该被提醒', emoji: '😤' },
+      { score: 2, text: '和其他同事私下讨论他怎么了', emoji: '💬' },
+      { score: 3, text: '找机会私下问他最近是不是遇到什么事了', emoji: '🤝' },
+      { score: 4, text: '在了解情况后，力所能及地提供一些支持', emoji: '🫂' },
+      { score: 5, text: '帮他一起找出影响工作的具体障碍，制定改进计划', emoji: '📋' },
+    ],
+  },
+  {
+    id: 'emo-h8', dimension: 'emotional', subtopic: Emo.aware,
+    text: '你发现自己在某类情境下总是有过度的情绪反应（比如每次被质疑就特别激动），你会？',
+    options: [
+      { score: 1, text: '觉得是别人触发了你，问题在别人', emoji: '👉' },
+      { score: 2, text: '知道自己有这个问题但不知道怎么改', emoji: '🤷' },
+      { score: 3, text: '开始留意每次触发时的身体感受和想法', emoji: '🔍' },
+      { score: 4, text: '追溯这个反应模式的源头——可能是某个早期的经历形成的', emoji: '🧭' },
+      { score: 5, text: '每次触发后做情绪日记，系统性地重塑自己的反应模式', emoji: '📓' },
+    ],
+  },
+
+  // ── 情感低分分支 8 题（regul/2, empat/2, aware/2, resil/2）──
+  {
+    id: 'emo-l1', dimension: 'emotional', subtopic: Emo.aware,
     text: '你因为一件小事发了很大的火，事后回想，你觉得？',
     options: [
       { score: 1, text: '就是对方的错，没什么好想的', emoji: '☝️' },
@@ -276,8 +397,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'emo-l2',
-    dimension: 'emotional',
+    id: 'emo-l2', dimension: 'emotional', subtopic: Emo.resil,
     text: '看到别人在朋友圈晒幸福，你有时会感到不舒服，你通常会？',
     options: [
       { score: 1, text: '直接划走，眼不见为净', emoji: '👆' },
@@ -288,8 +408,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'emo-l3',
-    dimension: 'emotional',
+    id: 'emo-l3', dimension: 'emotional', subtopic: Emo.regul,
     text: '有人在你很累的时候提了一个不太合理的要求，你会？',
     options: [
       { score: 1, text: '直接拒绝，态度可能不太好', emoji: '🙅' },
@@ -300,8 +419,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'emo-l4',
-    dimension: 'emotional',
+    id: 'emo-l4', dimension: 'emotional', subtopic: Emo.empat,
     text: '回想最近一次与人发生摩擦，你对当时的自己有怎样的认识？',
     options: [
       { score: 1, text: '全是对方的错，我没什么问题', emoji: '☝️' },
@@ -311,13 +429,57 @@ const questionDefs: Question[] = [
       { score: 5, text: '清楚自己的情绪触发点，并有意识地避免重复同样的模式', emoji: '🌱' },
     ],
   },
-
-  // ═══════════════════════════════════════════════════════
-  // 维度三：社会年龄 — 基准题（4 题）
-  // ═══════════════════════════════════════════════════════
+  // ── 情感低分分支 新增 4 题 ──
   {
-    id: 'soc-1',
-    dimension: 'social',
+    id: 'emo-l5', dimension: 'emotional', subtopic: Emo.aware,
+    text: '当有人问你"你现在是什么感觉"时，你通常能？',
+    options: [
+      { score: 1, text: '说不太清楚，就是"好"或"不好"', emoji: '🤷' },
+      { score: 2, text: '能说出大概是开心、难过、生气这种大类', emoji: '😊' },
+      { score: 3, text: '能描述出比较具体的感受，比如"有点失落但不是很难过"', emoji: '🗣️' },
+      { score: 4, text: '能区分相似但不同的情绪，比如"失望"和"灰心"', emoji: '🔬' },
+      { score: 5, text: '能用丰富的词汇精确描述自己的情绪状态及其强度', emoji: '🎨' },
+    ],
+  },
+  {
+    id: 'emo-l6', dimension: 'emotional', subtopic: Emo.resil,
+    text: '你期待已久的一件事情（比如旅行、演唱会）临时取消了，你会？',
+    options: [
+      { score: 1, text: '非常沮丧，一整天心情都被毁了', emoji: '😫' },
+      { score: 2, text: '失望，但过几个小时就好了', emoji: '😔' },
+      { score: 3, text: '马上想有什么替代方案可以填补这段时间', emoji: '💡' },
+      { score: 4, text: '接受意外，用这段时间做一件平时没时间做的事', emoji: '🎁' },
+      { score: 5, text: '明白失望是暂时的，主动调整心态去寻找意外的"机会窗口"', emoji: '🌟' },
+    ],
+  },
+  {
+    id: 'emo-l7', dimension: 'emotional', subtopic: Emo.regul,
+    text: '你看到一则令人揪心的社会新闻，情绪受到了很大冲击，你会？',
+    options: [
+      { score: 1, text: '忍不住一直刷相关消息，越看越难受', emoji: '📱' },
+      { score: 2, text: '心情沉重但不知道能做什么', emoji: '😟' },
+      { score: 3, text: '和身边的人聊聊自己的感受', emoji: '💬' },
+      { score: 4, text: '主动停止刷消息，给自己设置"信息消化时间"', emoji: '⏸️' },
+      { score: 5, text: '承认世界的复杂性，在共情和自我保护之间找到平衡', emoji: '☯️' },
+    ],
+  },
+  {
+    id: 'emo-l8', dimension: 'emotional', subtopic: Emo.empat,
+    text: '你的朋友做了一个你认为很蠢的决定，他来跟你倾诉后果，你会？',
+    options: [
+      { score: 1, text: '"我早就跟你说了吧"', emoji: '☝️' },
+      { score: 2, text: '虽然不说"早就告诉过你"，但心里这么想', emoji: '😐' },
+      { score: 3, text: '先听完他的感受，不急着给评价', emoji: '👂' },
+      { score: 4, text: '理解他做那个决定时的处境，帮他从后果中提取教训', emoji: '🤲' },
+      { score: 5, text: '陪伴他面对后果，同时让他感受到不管怎样都有人支持', emoji: '🫂' },
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════
+  // 🤝 社会年龄 — 基准题 4 题
+  // ═══════════════════════════════════════════════════
+  {
+    id: 'soc-1', dimension: 'social', subtopic: Soc.resp,
     text: '答应了帮朋友一个忙，临近时发现自己那天特别累，你会？',
     options: [
       { score: 1, text: '找个借口推掉，反正朋友应该能理解', emoji: '🙈' },
@@ -328,8 +490,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'soc-2',
-    dimension: 'social',
+    id: 'soc-2', dimension: 'social', subtopic: Soc.confl,
     text: '你和一位同事/同学对某件事的处理方式有严重分歧，你通常会？',
     options: [
       { score: 1, text: '坚持按自己的方式来，不想妥协', emoji: '🙅' },
@@ -340,8 +501,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'soc-3',
-    dimension: 'social',
+    id: 'soc-3', dimension: 'social', subtopic: Soc.gene,
     text: '身边有一个比你年轻很多的人在重要事情上犯了错，你的态度是？',
     options: [
       { score: 1, text: '"这都不会？" 不太想管', emoji: '🙄' },
@@ -352,8 +512,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'soc-4',
-    dimension: 'social',
+    id: 'soc-4', dimension: 'social', subtopic: Soc.bound,
     text: '你同时承担着多个角色（工作、家庭、朋友），它们出现时间冲突时，你通常？',
     options: [
       { score: 1, text: '谁催得急就先应付谁', emoji: '🔥' },
@@ -364,10 +523,9 @@ const questionDefs: Question[] = [
     ],
   },
 
-  // 社会年龄 — 高分分支题
+  // ── 社会高分分支 8 题（resp/2, confl/2, gene/2, bound/2）──
   {
-    id: 'soc-h1',
-    dimension: 'social',
+    id: 'soc-h1', dimension: 'social', subtopic: Soc.resp,
     text: '你所在的社区出现了一个公共问题（如垃圾乱放、停车纠纷），你的反应是？',
     options: [
       { score: 1, text: '这不关我的事，总有人会处理', emoji: '🤷' },
@@ -378,8 +536,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'soc-h2',
-    dimension: 'social',
+    id: 'soc-h2', dimension: 'social', subtopic: Soc.bound,
     text: '一个朋友总是在你这倾诉烦恼，但你需要倾诉时他却没什么耐心，你会？',
     options: [
       { score: 1, text: '直接疏远，不再联系', emoji: '👋' },
@@ -390,8 +547,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'soc-h3',
-    dimension: 'social',
+    id: 'soc-h3', dimension: 'social', subtopic: Soc.confl,
     text: '一个团队项目中，有成员明显在"搭便车"不干活，你会？',
     options: [
       { score: 1, text: '直接向上级或老师举报', emoji: '📢' },
@@ -402,8 +558,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'soc-h4',
-    dimension: 'social',
+    id: 'soc-h4', dimension: 'social', subtopic: Soc.gene,
     text: '过年回家，长辈说了你完全不认同的观点，你会？',
     options: [
       { score: 1, text: '直接反驳，争论起来', emoji: '⚔️' },
@@ -413,11 +568,55 @@ const questionDefs: Question[] = [
       { score: 5, text: '在不伤和气的范围内表达自己的看法，同时尊重对方持有不同观点的权利', emoji: '🤝' },
     ],
   },
-
-  // 社会年龄 — 低分分支题
+  // ── 社会高分分支 新增 4 题 ──
   {
-    id: 'soc-l1',
-    dimension: 'social',
+    id: 'soc-h5', dimension: 'social', subtopic: Soc.resp,
+    text: '你在一个志愿者组织中承担了一项任务，但后来发现这件事比预期难得多，你会？',
+    options: [
+      { score: 1, text: '说明原因后退出', emoji: '🏃' },
+      { score: 2, text: '勉强做完这次，下次不再接了', emoji: '😮‍💨' },
+      { score: 3, text: '坚持做完，但降低标准', emoji: '⚖️' },
+      { score: 4, text: '提前和团队沟通困难，协商调整目标或争取资源', emoji: '💬' },
+      { score: 5, text: '信守承诺但总结教训，下次接任务前更审慎评估自己的能力边界', emoji: '📋' },
+    ],
+  },
+  {
+    id: 'soc-h6', dimension: 'social', subtopic: Soc.bound,
+    text: '一个同事经常在下班后给你发工作消息，你感到私人时间被占用，你会？',
+    options: [
+      { score: 1, text: '忽略消息，上班再回', emoji: '📵' },
+      { score: 2, text: '看到了就回，但心里不舒服', emoji: '😤' },
+      { score: 3, text: '延迟回复——让对方逐渐习惯你不会即时响应', emoji: '⏰' },
+      { score: 4, text: '在合适的时机坦诚表达："非紧急的事我们上班聊"', emoji: '💬' },
+      { score: 5, text: '在保护自己边界的同时，了解对方的需求模式，找到双方都能接受的沟通规则', emoji: '🤝' },
+    ],
+  },
+  {
+    id: 'soc-h7', dimension: 'social', subtopic: Soc.confl,
+    text: '两个你都很在意的朋友之间发生了矛盾，各自来找你评理，你会？',
+    options: [
+      { score: 1, text: '站自己更亲近的那一方', emoji: '👈' },
+      { score: 2, text: '两边都安慰，但不表态', emoji: '🤲' },
+      { score: 3, text: '分别听两边的说法，尝试理解各自的视角', emoji: '👂' },
+      { score: 4, text: '帮他们找到误解的关键点，鼓励直接沟通', emoji: '🔑' },
+      { score: 5, text: '不替任何一方做判断，但为双方创造理解对方视角的机会', emoji: '🌉' },
+    ],
+  },
+  {
+    id: 'soc-h8', dimension: 'social', subtopic: Soc.gene,
+    text: '你手头有一个可以传授给新人的方法论，但整理出来需要花不少时间，你会？',
+    options: [
+      { score: 1, text: '太花时间了，算了', emoji: '🤷' },
+      { score: 2, text: '口头跟他们讲一下要点', emoji: '🗣️' },
+      { score: 3, text: '抽时间写一份简洁的指南', emoji: '📝' },
+      { score: 4, text: '系统整理成可复用的文档，方便后来的新人', emoji: '📚' },
+      { score: 5, text: '不仅整理方法，还会解释背后的思考逻辑，让对方知其然也知其所以然', emoji: '🧠' },
+    ],
+  },
+
+  // ── 社会低分分支 8 题（resp/2, confl/2, gene/2, bound/2）──
+  {
+    id: 'soc-l1', dimension: 'social', subtopic: Soc.bound,
     text: '你和一位老朋友因为生活轨迹不同，联系越来越少了，你通常会？',
     options: [
       { score: 1, text: '顺其自然，淡了就淡了', emoji: '🍂' },
@@ -428,8 +627,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'soc-l2',
-    dimension: 'social',
+    id: 'soc-l2', dimension: 'social', subtopic: Soc.confl,
     text: '你在一个聚会上遇到一群你不认识的人，你会？',
     options: [
       { score: 1, text: '找角落待着，玩手机', emoji: '📱' },
@@ -440,8 +638,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'soc-l3',
-    dimension: 'social',
+    id: 'soc-l3', dimension: 'social', subtopic: Soc.gene,
     text: '朋友约你周末一起做一件你不太感兴趣的事，你会？',
     options: [
       { score: 1, text: '直接说不去，找别的借口', emoji: '🙅' },
@@ -452,8 +649,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'soc-l4',
-    dimension: 'social',
+    id: 'soc-l4', dimension: 'social', subtopic: Soc.resp,
     text: '有人请你帮忙做一件你不太会的事情，你会？',
     options: [
       { score: 1, text: '直接说不会，推荐他找别人', emoji: '👈' },
@@ -463,13 +659,57 @@ const questionDefs: Question[] = [
       { score: 5, text: '评估自己的能力边界后给一个诚实的回应，需要时主动帮对方找到替代资源', emoji: '🎯' },
     ],
   },
-
-  // ═══════════════════════════════════════════════════════
-  // 维度四：生活态度年龄 — 基准题（4 题）
-  // ═══════════════════════════════════════════════════════
+  // ── 社会低分分支 新增 4 题 ──
   {
-    id: 'lif-1',
-    dimension: 'lifestyle',
+    id: 'soc-l5', dimension: 'social', subtopic: Soc.bound,
+    text: '有人向你借钱，但你觉得对方可能不太容易还，你会？',
+    options: [
+      { score: 1, text: '直接说没钱，拒绝', emoji: '🙅' },
+      { score: 2, text: '借了，但做好收不回来的心理准备', emoji: '💸' },
+      { score: 3, text: '问清楚用途和还款计划后再决定', emoji: '📋' },
+      { score: 4, text: '如果金额不大且能承受损失就借，金额较大则坦诚说明顾虑', emoji: '⚖️' },
+      { score: 5, text: '在帮对方的善意和保护双方关系之间找到平衡——有时候不借钱反而是对关系负责', emoji: '🎯' },
+    ],
+  },
+  {
+    id: 'soc-l6', dimension: 'social', subtopic: Soc.confl,
+    text: '有人在公开场合对你的工作成果提出了尖锐批评，你会？',
+    options: [
+      { score: 1, text: '当场反驳，维护自己的面子', emoji: '🛡️' },
+      { score: 2, text: '表面不说什么，心里很不舒服', emoji: '😤' },
+      { score: 3, text: '感谢对方的反馈，说会考虑', emoji: '🙏' },
+      { score: 4, text: '请对方具体说说哪里可以改进', emoji: '🔍' },
+      { score: 5, text: '区分"对方的态度"和"对方说的内容"——前者可以不计较，后者认真对待', emoji: '⚖️' },
+    ],
+  },
+  {
+    id: 'soc-l7', dimension: 'social', subtopic: Soc.gene,
+    text: '你发现你的经验和知识对身边一些人有帮助，但主动分享可能显得"好为人师"，你会？',
+    options: [
+      { score: 1, text: '不说，省得被人嫌', emoji: '🤐' },
+      { score: 2, text: '如果有人问就说，没人问就不提', emoji: '🤷' },
+      { score: 3, text: '在合适的场合自然地分享自己的经验', emoji: '🗣️' },
+      { score: 4, text: '用提问的方式引导对方思考，而不是直接给答案', emoji: '❓' },
+      { score: 5, text: '创造一个轻松的交流氛围，让分享变成双向的对话而非单向的教导', emoji: '🔄' },
+    ],
+  },
+  {
+    id: 'soc-l8', dimension: 'social', subtopic: Soc.resp,
+    text: '你承接了一件不属于你职责范围但确实需要有人做的事，你通常会？',
+    options: [
+      { score: 1, text: '能不接就不接，多一事不如少一事', emoji: '🙅' },
+      { score: 2, text: '迫于压力接下，但心里不情愿', emoji: '😮‍💨' },
+      { score: 3, text: '接下并尽力做好', emoji: '💪' },
+      { score: 4, text: '接下后，把事情做得比预期的更好', emoji: '⭐' },
+      { score: 5, text: '不仅做好，还在过程中建立流程避免下次再出现"没人负责"的情况', emoji: '🔄' },
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════
+  // 🌿 生活态度年龄 — 基准题 4 题
+  // ═══════════════════════════════════════════════════
+  {
+    id: 'lif-1', dimension: 'lifestyle', subtopic: Lif.plan,
     text: '发了一笔意料之外的奖金（比如 5000 元），你的第一反应是？',
     options: [
       { score: 1, text: '马上买那个一直想要的东西犒劳自己', emoji: '🛍️' },
@@ -480,8 +720,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'lif-2',
-    dimension: 'lifestyle',
+    id: 'lif-2', dimension: 'lifestyle', subtopic: Lif.heal,
     text: '身体发出了疲劳信号（头痛、失眠、精力下降），你通常会？',
     options: [
       { score: 1, text: '扛一扛就过去了，年轻无所谓', emoji: '💪' },
@@ -492,8 +731,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'lif-3',
-    dimension: 'lifestyle',
+    id: 'lif-3', dimension: 'lifestyle', subtopic: Lif.risk,
     text: '面临"高风险可能高回报"和"低风险但收益稳定"的选择，你倾向于？',
     options: [
       { score: 1, text: '毫不犹豫选高风险，富贵险中求', emoji: '🎲' },
@@ -504,8 +742,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'lif-4',
-    dimension: 'lifestyle',
+    id: 'lif-4', dimension: 'lifestyle', subtopic: Lif.grow,
     text: '对于"保持学习新东西"这件事，你的真实状态是？',
     options: [
       { score: 1, text: '除非被迫（如工作要求）否则不太主动学', emoji: '😴' },
@@ -516,10 +753,9 @@ const questionDefs: Question[] = [
     ],
   },
 
-  // 生活态度年龄 — 高分分支题
+  // ── 生活态度高分分支 8 题（plan/2, heal/2, risk/2, grow/2）──
   {
-    id: 'lif-h1',
-    dimension: 'lifestyle',
+    id: 'lif-h1', dimension: 'lifestyle', subtopic: Lif.plan,
     text: '你做了一个重要决定，一段时间后回头看结果不太好，你会？',
     options: [
       { score: 1, text: '后悔当初的决定，但也没办法', emoji: '😞' },
@@ -530,8 +766,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'lif-h2',
-    dimension: 'lifestyle',
+    id: 'lif-h2', dimension: 'lifestyle', subtopic: Lif.heal,
     text: '你的生活空间（房间/办公桌/电脑桌面）通常是？',
     options: [
       { score: 1, text: '东西随手放，找东西经常要翻半天', emoji: '🌪️' },
@@ -542,8 +777,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'lif-h3',
-    dimension: 'lifestyle',
+    id: 'lif-h3', dimension: 'lifestyle', subtopic: Lif.risk,
     text: '设想你 70 岁时的生活，你的心态更接近？',
     options: [
       { score: 1, text: '没想过那么远', emoji: '🤷' },
@@ -554,8 +788,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'lif-h4',
-    dimension: 'lifestyle',
+    id: 'lif-h4', dimension: 'lifestyle', subtopic: Lif.grow,
     text: '你每天的生活节奏更接近？',
     options: [
       { score: 1, text: '完全没有固定节奏，每天看心情', emoji: '🎢' },
@@ -565,11 +798,55 @@ const questionDefs: Question[] = [
       { score: 5, text: '长期保持稳定的生活节奏，形成习惯后几乎不需要意志力来维持', emoji: '🔄' },
     ],
   },
-
-  // 生活态度年龄 — 低分分支题
+  // ── 生活态度高分分支 新增 4 题 ──
   {
-    id: 'lif-l1',
-    dimension: 'lifestyle',
+    id: 'lif-h5', dimension: 'lifestyle', subtopic: Lif.plan,
+    text: '你有一些长期目标（如买房、创业、FIRE），你目前的进展是？',
+    options: [
+      { score: 1, text: '只有大概的想法，还没开始行动', emoji: '💭' },
+      { score: 2, text: '断断续续在努力，但进展很慢', emoji: '🐢' },
+      { score: 3, text: '有明确计划，按部就班推进中', emoji: '📋' },
+      { score: 4, text: '定期检查进度，根据实际情况动态调整计划', emoji: '📊' },
+      { score: 5, text: '目标已在按规划推进，同时保持灵活性应对变化', emoji: '🧭' },
+    ],
+  },
+  {
+    id: 'lif-h6', dimension: 'lifestyle', subtopic: Lif.heal,
+    text: '谈到"锻炼身体"，下列描述最接近你的是？',
+    options: [
+      { score: 1, text: '知道该锻炼但一直没开始', emoji: '🛋️' },
+      { score: 2, text: '偶尔心血来潮运动一下', emoji: '🤸' },
+      { score: 3, text: '每周有固定的运动时间', emoji: '📅' },
+      { score: 4, text: '有具体的运动计划，包含有氧、力量、柔韧性等不同维度', emoji: '🏋️' },
+      { score: 5, text: '锻炼已成为生活不可或缺的一部分，不是"坚持"而是"享受"', emoji: '🏃' },
+    ],
+  },
+  {
+    id: 'lif-h7', dimension: 'lifestyle', subtopic: Lif.risk,
+    text: '你有一个朋友邀请你一起投资一个"听起来很不错"的项目，你会？',
+    options: [
+      { score: 1, text: '朋友推荐的应该没问题，跟着投', emoji: '🤝' },
+      { score: 2, text: '投一小笔试试水', emoji: '💧' },
+      { score: 3, text: '先了解项目的具体情况再决定', emoji: '🔍' },
+      { score: 4, text: '独立做尽职调查，不被朋友关系影响判断', emoji: '📊' },
+      { score: 5, text: '用自己能承受全部损失的金额参与，权当学习和支持朋友', emoji: '⚖️' },
+    ],
+  },
+  {
+    id: 'lif-h8', dimension: 'lifestyle', subtopic: Lif.grow,
+    text: '你参加了一次培训或读了一本好书之后，接下来通常会？',
+    options: [
+      { score: 1, text: '感觉学到了很多，但很快就忘了', emoji: '💨' },
+      { score: 2, text: '记了一些笔记，偶尔翻看', emoji: '📝' },
+      { score: 3, text: '把学到的一两个方法应用在实际中', emoji: '🔧' },
+      { score: 4, text: '系统整理知识要点，形成自己的理解框架', emoji: '🧩' },
+      { score: 5, text: '将新知识和已有的知识体系连接，输出成自己的方法论或教给别人', emoji: '🔗' },
+    ],
+  },
+
+  // ── 生活态度低分分支 8 题（plan/2, heal/2, risk/2, grow/2）──
+  {
+    id: 'lif-l1', dimension: 'lifestyle', subtopic: Lif.risk,
     text: '你对"生活需要一些不确定性和冒险"这句话的看法是？',
     options: [
       { score: 1, text: '完全同意！不确定性让生活有趣', emoji: '🎲' },
@@ -580,8 +857,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'lif-l2',
-    dimension: 'lifestyle',
+    id: 'lif-l2', dimension: 'lifestyle', subtopic: Lif.plan,
     text: '到了一个新城市，你有一天空闲时间，你更想？',
     options: [
       { score: 1, text: '不做计划，走到哪算哪', emoji: '🚶' },
@@ -592,8 +868,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'lif-l3',
-    dimension: 'lifestyle',
+    id: 'lif-l3', dimension: 'lifestyle', subtopic: Lif.grow,
     text: '你有一个自己很喜欢的旧习惯，但有人建议你换一种更高效的方式，你会？',
     options: [
       { score: 1, text: '不想改，习惯了的就是最好的', emoji: '🙅' },
@@ -604,8 +879,7 @@ const questionDefs: Question[] = [
     ],
   },
   {
-    id: 'lif-l4',
-    dimension: 'lifestyle',
+    id: 'lif-l4', dimension: 'lifestyle', subtopic: Lif.heal,
     text: '马上要发工资了，你这个月还剩一些钱，你会？',
     options: [
       { score: 1, text: '刚好用完，不剩就不剩', emoji: '🤷' },
@@ -613,6 +887,51 @@ const questionDefs: Question[] = [
       { score: 3, text: '剩多少存多少', emoji: '💰' },
       { score: 4, text: '按计划存起来，和下个月的钱一起规划', emoji: '📊' },
       { score: 5, text: '自动归入储蓄/投资计划，让钱在不知不觉中积累', emoji: '🏦' },
+    ],
+  },
+  // ── 生活态度低分分支 新增 4 题 ──
+  {
+    id: 'lif-l5', dimension: 'lifestyle', subtopic: Lif.risk,
+    text: '一个朋友提议来一场"说走就走的旅行"——明天出发、目的地随机，你的反应是？',
+    options: [
+      { score: 1, text: '太刺激了！立刻收拾行李', emoji: '🧳' },
+      { score: 2, text: '有点心动，但担心准备不充分', emoji: '🤔' },
+      { score: 3, text: '可以接受，但至少查一下天气和住宿', emoji: '🔍' },
+      { score: 4, text: '喜欢有准备的旅行，建议把时间推迟几天做些规划', emoji: '📋' },
+      { score: 5, text: '只有提前安排好的旅行才能让自己真正放松享受', emoji: '🧘' },
+    ],
+  },
+  {
+    id: 'lif-l6', dimension: 'lifestyle', subtopic: Lif.plan,
+    text: '你的手机相册通常是？',
+    options: [
+      { score: 1, text: '几千张照片，从来没整理过', emoji: '🌪️' },
+      { score: 2, text: '偶尔删一些重复的，清清空间', emoji: '🗑️' },
+      { score: 3, text: '会定期翻看，删除不需要的', emoji: '📂' },
+      { score: 4, text: '有分类整理的习惯，重要照片都有备份', emoji: '☁️' },
+      { score: 5, text: '有完整的整理和备份体系，任何一张照片都能快速找到', emoji: '📊' },
+    ],
+  },
+  {
+    id: 'lif-l7', dimension: 'lifestyle', subtopic: Lif.grow,
+    text: '如果有人告诉你"你说话的方式容易让人误会"，你通常的反应是？',
+    options: [
+      { score: 1, text: '"我说话就这样，误会是别人的问题"', emoji: '🤷' },
+      { score: 2, text: '有点在意但不会刻意改变', emoji: '😐' },
+      { score: 3, text: '问对方具体是什么表达让人误会了', emoji: '❓' },
+      { score: 4, text: '尝试调整自己的表达方式，观察对方反应的变化', emoji: '🔄' },
+      { score: 5, text: '把这视为沟通能力提升的契机，主动学习更有效的表达方式', emoji: '📚' },
+    ],
+  },
+  {
+    id: 'lif-l8', dimension: 'lifestyle', subtopic: Lif.heal,
+    text: '关于"睡眠"，下列描述最接近你的是？',
+    options: [
+      { score: 1, text: '经常熬夜，困了就睡，不困就不睡', emoji: '🌙' },
+      { score: 2, text: '知道熬夜不好但很难改', emoji: '😴' },
+      { score: 3, text: '大多数时候能保证 7 小时左右的睡眠', emoji: '⏰' },
+      { score: 4, text: '有固定的入睡和起床时间，很少打破', emoji: '📅' },
+      { score: 5, text: '将优质睡眠视为高效生活的基础，有完整的睡前仪式和睡眠环境优化', emoji: '🛏️' },
     ],
   },
 ];
@@ -627,38 +946,85 @@ for (const q of questionDefs) {
   questionMap[q.id] = q;
 }
 
-/** 所有题目数量（题库总量，非单次测试量） */
-export const TOTAL_QUESTIONS = questionDefs.length;
+/** 从分支池中按子主题各随机选 1 题 */
+function pickFromPool(poolIds: string[], subtopicGroups: string[][]): string[] {
+  // Fisher-Yates shuffle with Math.random (different each call)
+  const result: string[] = [];
+  for (const group of subtopicGroups) {
+    const available = group.filter((id) => poolIds.includes(id));
+    if (available.length > 0) {
+      result.push(available[Math.floor(Math.random() * available.length)]);
+    }
+  }
+  return result;
+}
 
 /** 每个维度的分支配置 */
 export const DIMENSION_BRANCHES: Record<Dimension, DimensionBranch> = {
   cognitive: {
     baseline: ['cog-1', 'cog-2', 'cog-3', 'cog-4'],
-    branchHigh: ['cog-h1', 'cog-h2', 'cog-h3', 'cog-h4'],
-    branchLow: ['cog-l1', 'cog-l2', 'cog-l3', 'cog-l4'],
-    branchThreshold: 13, // 基准题总分 ≥ 13 走高分分支
+    branchHigh: {
+      questionIds: ['cog-h1','cog-h2','cog-h3','cog-h4','cog-h5','cog-h6','cog-h7','cog-h8'],
+      subtopicGroups: [['cog-h1','cog-h5'], ['cog-h2','cog-h6'], ['cog-h3','cog-h7'], ['cog-h4','cog-h8']],
+    },
+    branchLow: {
+      questionIds: ['cog-l1','cog-l2','cog-l3','cog-l4','cog-l5','cog-l6','cog-l7','cog-l8'],
+      subtopicGroups: [['cog-l1','cog-l5'], ['cog-l2','cog-l6'], ['cog-l3','cog-l7'], ['cog-l4','cog-l8']],
+    },
+    branchThreshold: 13,
   },
   emotional: {
     baseline: ['emo-1', 'emo-2', 'emo-3', 'emo-4'],
-    branchHigh: ['emo-h1', 'emo-h2', 'emo-h3', 'emo-h4'],
-    branchLow: ['emo-l1', 'emo-l2', 'emo-l3', 'emo-l4'],
+    branchHigh: {
+      questionIds: ['emo-h1','emo-h2','emo-h3','emo-h4','emo-h5','emo-h6','emo-h7','emo-h8'],
+      subtopicGroups: [['emo-h1','emo-h5'], ['emo-h2','emo-h6'], ['emo-h3','emo-h7'], ['emo-h4','emo-h8']],
+    },
+    branchLow: {
+      questionIds: ['emo-l1','emo-l2','emo-l3','emo-l4','emo-l5','emo-l6','emo-l7','emo-l8'],
+      subtopicGroups: [['emo-l1','emo-l5'], ['emo-l2','emo-l6'], ['emo-l3','emo-l7'], ['emo-l4','emo-l8']],
+    },
     branchThreshold: 13,
   },
   social: {
     baseline: ['soc-1', 'soc-2', 'soc-3', 'soc-4'],
-    branchHigh: ['soc-h1', 'soc-h2', 'soc-h3', 'soc-h4'],
-    branchLow: ['soc-l1', 'soc-l2', 'soc-l3', 'soc-l4'],
+    branchHigh: {
+      questionIds: ['soc-h1','soc-h2','soc-h3','soc-h4','soc-h5','soc-h6','soc-h7','soc-h8'],
+      subtopicGroups: [['soc-h1','soc-h5'], ['soc-h2','soc-h6'], ['soc-h3','soc-h7'], ['soc-h4','soc-h8']],
+    },
+    branchLow: {
+      questionIds: ['soc-l1','soc-l2','soc-l3','soc-l4','soc-l5','soc-l6','soc-l7','soc-l8'],
+      subtopicGroups: [['soc-l1','soc-l5'], ['soc-l2','soc-l6'], ['soc-l3','soc-l7'], ['soc-l4','soc-l8']],
+    },
     branchThreshold: 13,
   },
   lifestyle: {
     baseline: ['lif-1', 'lif-2', 'lif-3', 'lif-4'],
-    branchHigh: ['lif-h1', 'lif-h2', 'lif-h3', 'lif-h4'],
-    branchLow: ['lif-l1', 'lif-l2', 'lif-l3', 'lif-l4'],
+    branchHigh: {
+      questionIds: ['lif-h1','lif-h2','lif-h3','lif-h4','lif-h5','lif-h6','lif-h7','lif-h8'],
+      subtopicGroups: [['lif-h1','lif-h5'], ['lif-h2','lif-h6'], ['lif-h3','lif-h7'], ['lif-h4','lif-h8']],
+    },
+    branchLow: {
+      questionIds: ['lif-l1','lif-l2','lif-l3','lif-l4','lif-l5','lif-l6','lif-l7','lif-l8'],
+      subtopicGroups: [['lif-l1','lif-l5'], ['lif-l2','lif-l6'], ['lif-l3','lif-l7'], ['lif-l4','lif-l8']],
+    },
     branchThreshold: 13,
   },
 };
 
-/** 累计每维度总分（仅用于计算分支，不是最终分数） */
+/** 选择分支题：从匹配的分支池中，按子主题各随机选 1 题 */
+export function selectBranchQuestions(dimension: Dimension, isHigh: boolean): string[] {
+  const branch = DIMENSION_BRANCHES[dimension];
+  const pool = isHigh ? branch.branchHigh : branch.branchLow;
+  return pickFromPool(pool.questionIds, pool.subtopicGroups);
+}
+
+/** 总题目数（题库大小） */
+export const TOTAL_BANK_SIZE = questionDefs.length;
+
+/** 单次测试总题数（16 基准 + 16 分支 = 32） */
+export const QUESTIONS_PER_TEST = 32;
+
+/** 累计一个维度已答题总分（用于计算分支，仅基准题） */
 export function getDimensionRunningScore(
   answers: Record<string, number>,
   dimension: Dimension
@@ -671,28 +1037,25 @@ export function getDimensionRunningScore(
   return score;
 }
 
-/** 计算一个维度的总分（基准 + 分支） */
+/** 计算一个维度所有已答题的总分 */
 export function getDimensionTotalScore(
   answers: Record<string, number>,
   dimension: Dimension
 ): number {
   let total = 0;
   const branch = DIMENSION_BRANCHES[dimension];
-  const allIds = [...branch.baseline, ...branch.branchHigh, ...branch.branchLow];
+  const allIds = [
+    ...branch.baseline,
+    ...branch.branchHigh.questionIds,
+    ...branch.branchLow.questionIds,
+  ];
   for (const id of allIds) {
     total += answers[id] ?? 0;
   }
   return total;
 }
 
-/** 用于 calculate.ts 的兼容接口 */
+/** calculate.ts 兼容 */
 export function getQuestionsByDimension(dimension: string): Question[] {
   return questionDefs.filter((q) => q.dimension === dimension);
 }
-
-/** 单次测试总题数（16 基准 + 16 分支 = 32） */
-export const QUESTIONS_PER_TEST =
-  Object.values(DIMENSION_BRANCHES).reduce(
-    (sum, b) => sum + b.baseline.length + b.branchHigh.length,
-    0
-  );

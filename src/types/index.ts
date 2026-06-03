@@ -17,6 +17,7 @@ export const DIMENSION_ICONS: Record<Dimension, string> = {
 export interface Question {
   id: string;
   dimension: Dimension;
+  subtopic: string;        // sub-topic tag for diverse question selection
   text: string;
   options: Option[];
 }
@@ -63,12 +64,18 @@ export interface AgeComparison {
   }[];
 }
 
+/** 分支题目池：每个子主题下有 2 题，选取时随机各取 1 题 */
+export interface BranchPool {
+  questionIds: string[];        // 该池所有题目 ID（用于判断已选）
+  subtopicGroups: string[][];   // 每组是一个子主题的候选题目，如 [["cog-h1","cog-h2"], ["cog-h3","cog-h4"]]
+}
+
 /** 每维度的分支题目结构 */
 export interface DimensionBranch {
-  baseline: string[];     // 基准题 ID 列表（所有人相同）
-  branchHigh: string[];   // 高分分支题 ID 列表（偏成熟）
-  branchLow: string[];    // 低分分支题 ID 列表（偏年轻）
-  branchThreshold: number; // 基准题总分多少以上走分支 High
+  baseline: string[];         // 基准题 ID 列表（所有人相同）
+  branchHigh: BranchPool;     // 高分分支池
+  branchLow: BranchPool;      // 低分分支池
+  branchThreshold: number;    // 基准题总分多少以上走分支 High
 }
 
 export interface QuizState {

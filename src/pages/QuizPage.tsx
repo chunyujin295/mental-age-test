@@ -5,6 +5,7 @@ import {
   questionMap,
   DIMENSION_BRANCHES,
   getDimensionRunningScore,
+  selectBranchQuestions,
   QUESTIONS_PER_TEST,
 } from '../data/questions';
 import { calculateBaseResult } from '../utils/calculate';
@@ -29,8 +30,9 @@ function getCompletedDimension(
     // Make sure all baseline questions for this dim are answered
     const allBaselineAnswered = branch.baseline.every((id) => answers[id] !== undefined);
     // Make sure we haven't already appended branch questions for this dim
-    const branchAlreadyAppended = branch.branchHigh.some((id) => questionOrder.includes(id)) ||
-      branch.branchLow.some((id) => questionOrder.includes(id));
+    const branchAlreadyAppended =
+      branch.branchHigh.questionIds.some((id) => questionOrder.includes(id)) ||
+      branch.branchLow.questionIds.some((id) => questionOrder.includes(id));
 
     if (allBaselineAnswered && !branchAlreadyAppended) {
       return dim;
@@ -72,8 +74,10 @@ export default function QuizPage() {
           { ...state.answers, [currentId]: score },
           completedDim
         );
-        const branchIds =
-          runningScore >= branch.branchThreshold ? branch.branchHigh : branch.branchLow;
+        const isHigh = runningScore >= branch.branchThreshold;
+
+        // 从匹配的分支池中按子主题各随机选 1 题
+        const branchIds = selectBranchQuestions(completedDim, isHigh);
 
         // Append branch questions
         dispatch({ type: 'APPEND_QUESTIONS', payload: branchIds });
