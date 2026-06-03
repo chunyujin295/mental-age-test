@@ -89,24 +89,22 @@ npm run dev
 └──────────────────────────────────┘
 ```
 
-### 1. 物理机：克隆项目 & 安装生产依赖
+### 1. 物理机：克隆项目 & 构建
 
 ```bash
 # 克隆项目到你的代码目录
 cd /home/yj/code
-git clone git@github.com:chunyujin295/test-your-mental-age.git mental-age-test
+git clone git@github.com:chunyujin295/mental-age-test.git mental-age-test
 cd mental-age-test
 
-# 仅安装生产依赖（serve），跳过 Vite/TypeScript 等构建工具
-# 因为 dist/ 已在本地构建好并包含在仓库中，服务器无需再构建
-npm install --production
-```
+# 安装依赖
+npm install
 
-> **为什么用 `--production`？**
->
-> 构建工具（Vite、TypeScript 等）在 `devDependencies` 中，它们需要 Node.js 20+。
-> 服务器 Node.js 18 无法运行 Vite 8，但 `serve`（生产依赖）可以在 Node.js 18 上正常运行。
-> 所以策略是：**本地构建 → 推送 dist/ → 服务器只装 serve**。
+# 构建生产版本
+npm run build
+
+# 产物在 dist/ 目录中
+```
 
 ### 2. 物理机：配置 systemctl 开机自启
 
@@ -264,8 +262,8 @@ curl https://your-domain.com/mental-age/
 ```bash
 cd /home/yj/code/mental-age-test
 git pull
-# dist/ 已在本地构建好包含在仓库中，无需服务器端构建
-# 如有新增生产依赖才需执行 npm install --production
+npm install        # 如有新依赖
+npm run build      # 重新构建
 sudo systemctl restart mental-age-test
 ```
 
