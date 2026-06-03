@@ -291,28 +291,32 @@ Please upgrade your Node.js version.
 
 原因是 Vite 8 需要 Node.js 20+，而服务器上的是 18.x。升级方法：
 
-**方法一：NodeSource 安装（推荐，适用于 Ubuntu/Debian）**
+**方法一：nvm + 国内镜像（推荐，速度最快）**
 
 ```bash
-# 查看当前版本
-node -v
+# 安装 nvm（如果尚未安装）
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+source ~/.bashrc
 
-# 安装 NodeSource 20.x 源
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+# 使用 npmmirror 镜像加速下载
+export NVM_NODEJS_ORG_MIRROR=https://npmmirror.com/mirrors/node
 
-# 升级
-sudo apt-get install -y nodejs
+# 安装 Node.js 20
+nvm install 20
+nvm use 20
+nvm alias default 20
 
 # 验证
 node -v   # 应显示 v20.x.x
 ```
 
-**方法二：nvm（如果你之前用 nvm 装的）**
+**方法二：NodeSource（如果 apt-get 太慢，先挂代理）**
 
 ```bash
-nvm install 20
-nvm use 20
-nvm alias default 20
+# 挂代理后执行（把 http://proxy:port 替换为你的代理地址）
+export https_proxy=http://proxy:port
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
 ```
 
 升级完成后重新构建部署：
