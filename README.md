@@ -280,6 +280,50 @@ sudo systemctl restart mental-age-test
 | 重载 Nginx | `sudo systemctl reload nginx` |
 | 重新构建 | `npm run build` |
 
+### 故障排查：Node.js 版本过低
+
+如果部署时遇到以下报错：
+
+```
+You are using Node.js 18.19.1. Vite requires Node.js version 20.19+ or 22.12+.
+Please upgrade your Node.js version.
+```
+
+原因是 Vite 8 需要 Node.js 20+，而服务器上的是 18.x。升级方法：
+
+**方法一：NodeSource 安装（推荐，适用于 Ubuntu/Debian）**
+
+```bash
+# 查看当前版本
+node -v
+
+# 安装 NodeSource 20.x 源
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+
+# 升级
+sudo apt-get install -y nodejs
+
+# 验证
+node -v   # 应显示 v20.x.x
+```
+
+**方法二：nvm（如果你之前用 nvm 装的）**
+
+```bash
+nvm install 20
+nvm use 20
+nvm alias default 20
+```
+
+升级完成后重新构建部署：
+
+```bash
+cd /home/yj/code/mental-age-test
+npm install
+npm run build
+sudo systemctl restart mental-age-test
+```
+
 ---
 
 ## 📁 项目结构
