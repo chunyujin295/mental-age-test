@@ -6,7 +6,7 @@ import ResultPage from './pages/ResultPage';
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/mental-age">
       <QuizProvider>
         <Routes>
           <Route path="/" element={<HomePage />} />
