@@ -63,9 +63,18 @@ export interface AgeComparison {
   }[];
 }
 
+/** 每维度的分支题目结构 */
+export interface DimensionBranch {
+  baseline: string[];     // 基准题 ID 列表（所有人相同）
+  branchHigh: string[];   // 高分分支题 ID 列表（偏成熟）
+  branchLow: string[];    // 低分分支题 ID 列表（偏年轻）
+  branchThreshold: number; // 基准题总分多少以上走分支 High
+}
+
 export interface QuizState {
   answers: Record<string, number>;
   currentQuestionIndex: number;
+  questionOrder: string[];  // 动态题目 ID 序列
   baseResult: BaseResult | null;
   ageComparison: AgeComparison | null;
 }
@@ -73,6 +82,7 @@ export interface QuizState {
 export type QuizAction =
   | { type: 'ANSWER_QUESTION'; payload: { questionId: string; score: number } }
   | { type: 'GO_TO_QUESTION'; payload: number }
+  | { type: 'APPEND_QUESTIONS'; payload: string[] }
   | { type: 'SET_BASE_RESULT'; payload: BaseResult }
   | { type: 'SET_AGE_COMPARISON'; payload: AgeComparison }
   | { type: 'RESET' };

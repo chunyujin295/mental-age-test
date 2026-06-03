@@ -1,6 +1,6 @@
 import type { Dimension, DimensionResult, BaseResult, AgeComparison } from '../types';
 import { DIMENSION_LABELS, DIMENSION_ICONS } from '../types';
-import { getQuestionsByDimension } from '../data/questions';
+import { getDimensionTotalScore } from '../data/questions';
 
 // ============================================================
 // 维度科学背景
@@ -292,11 +292,7 @@ export function calculateBaseResult(answers: Record<string, number>): BaseResult
   const dimensions: Dimension[] = ['cognitive', 'emotional', 'social', 'lifestyle'];
 
   const dimensionResults: DimensionResult[] = dimensions.map((dim) => {
-    const dimQuestions = getQuestionsByDimension(dim);
-    let rawScore = 0;
-    for (const q of dimQuestions) {
-      rawScore += answers[q.id] ?? 0;
-    }
+    const rawScore = getDimensionTotalScore(answers, dim);
 
     const mentalAge = mapToAge(rawScore);
     const percentage = mapToPercentage(rawScore);

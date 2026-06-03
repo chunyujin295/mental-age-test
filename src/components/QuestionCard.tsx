@@ -1,4 +1,5 @@
-import type { Question } from '../types';
+import { useMemo } from 'react';
+import type { Question, Option } from '../types';
 
 interface QuestionCardProps {
   question: Question;
@@ -6,17 +7,36 @@ interface QuestionCardProps {
   onSelect: (score: number) => void;
 }
 
+/** Deterministic shuffle based on question ID — stable on re-render but random across questions */
+function seededShuffle(arr: Option[], seed: string): Option[] {
+  const shuffled = [...arr];
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = ((hash << 5) - hash + seed.charCodeAt(i)) | 0;
+  }
+  // Fisher-Yates with seeded random
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    hash = ((hash << 5) - hash + i) | 0;
+    const j = ((hash >>> 0) % (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 export default function QuestionCard({ question, selectedScore, onSelect }: QuestionCardProps) {
+  const shuffledOptions = useMemo(
+    () => seededShuffle(question.options, question.id),
+    [question.id, question.options]
+  );
+
   return (
     <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
-      {/* Question text */}
       <h2 className="text-white text-xl font-medium mb-6 leading-relaxed">
         {question.text}
       </h2>
 
-      {/* Options */}
       <div className="space-y-2">
-        {question.options.map((option) => {
+        {shuffledOptions.map((option) => {
           const isSelected = selectedScore === option.score;
           return (
             <button
@@ -31,9 +51,7 @@ export default function QuestionCard({ question, selectedScore, onSelect }: Ques
               <span className="text-xl flex-shrink-0">{option.emoji}</span>
               <span className="text-sm leading-snug">{option.text}</span>
               {isSelected && (
-                <span className="ml-auto text-primary-500 text-lg flex-shrink-0">
-                  ✓
-                </span>
+                <span className="ml-auto text-primary-500 text-lg flex-shrink-0">✓</span>
               )}
             </button>
           );
