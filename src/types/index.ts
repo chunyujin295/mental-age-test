@@ -18,6 +18,7 @@ export interface Question {
   id: string;
   dimension: Dimension;
   subtopic: string;        // sub-topic tag for diverse question selection
+  reverse?: boolean;       // if true, scores are flipped (1↔5) before aggregation
   text: string;
   options: Option[];
 }

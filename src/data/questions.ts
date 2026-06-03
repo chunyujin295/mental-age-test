@@ -934,6 +934,99 @@ const questionDefs: Question[] = [
       { score: 5, text: '将优质睡眠视为高效生活的基础，有完整的睡前仪式和睡眠环境优化', emoji: '🛏️' },
     ],
   },
+
+  // ═══════════════════════════════════════════════════
+  // 反向计分题（8题，打破"成熟=高分"的模式）
+  // 选项得分：5=年轻特质，1=成熟特质；通过 reverse 标记翻转
+  // ═══════════════════════════════════════════════════
+  {
+    id: 'cog-r1', dimension: 'cognitive', subtopic: Cog.flex, reverse: true,
+    text: '有人告诉你"这件事没有标准流程"，让你自己摸索，你的感受是？',
+    options: [
+      { score: 1, text: '不安，希望至少有个框架或参考', emoji: '😟' },
+      { score: 2, text: '有点茫然，但可以试一试', emoji: '🤔' },
+      { score: 3, text: '无所谓，有指引没指引都行', emoji: '😐' },
+      { score: 4, text: '挺有意思的，我喜欢自己探索', emoji: '🔍' },
+      { score: 5, text: '太好了！自由发挥正是我擅长的', emoji: '🚀' },
+    ],
+  },
+  {
+    id: 'cog-r2', dimension: 'cognitive', subtopic: Cog.curio, reverse: true,
+    text: '你对"凭直觉做决策"这件事怎么看？',
+    options: [
+      { score: 1, text: '直觉不可靠，每次都应该系统分析', emoji: '📊' },
+      { score: 2, text: '重要的事还是要分析，小事可以凭直觉', emoji: '⚖️' },
+      { score: 3, text: '有时候直觉比分析更准', emoji: '🤔' },
+      { score: 4, text: '经常凭直觉做决定，大部分时候都不错', emoji: '💫' },
+      { score: 5, text: '我相信直觉是自己经验的内化，是一种高级智慧', emoji: '🧠' },
+    ],
+  },
+  {
+    id: 'emo-r1', dimension: 'emotional', subtopic: Emo.regul, reverse: true,
+    text: '看了一部非常感人的电影，你在影院/屏幕前哭了，你会？',
+    options: [
+      { score: 1, text: '觉得不好意思，迅速擦干眼泪', emoji: '😳' },
+      { score: 2, text: '偷偷哭，不让旁边的人发现', emoji: '🤫' },
+      { score: 3, text: '自然地哭，不刻意掩饰', emoji: '😢' },
+      { score: 4, text: '哭就哭了，被感动是人之常情', emoji: '💧' },
+      { score: 5, text: '尽情沉浸其中——能被打动的能力本身就值得珍惜', emoji: '🎭' },
+    ],
+  },
+  {
+    id: 'emo-r2', dimension: 'emotional', subtopic: Emo.aware, reverse: true,
+    text: '有人对你说"你太敏感了"，你的内心反应是？',
+    options: [
+      { score: 1, text: '觉得被冒犯了，敏感是缺点', emoji: '😤' },
+      { score: 2, text: '以后尽量表现得"不那么敏感"', emoji: '😐' },
+      { score: 3, text: '敏感有好有坏，看情况', emoji: '🤷' },
+      { score: 4, text: '敏感让我更细腻，是优势不是缺点', emoji: '💪' },
+      { score: 5, text: '敏感是我感知世界的方式——它让我成为我', emoji: '🌟' },
+    ],
+  },
+  {
+    id: 'soc-r1', dimension: 'social', subtopic: Soc.bound, reverse: true,
+    text: '一个陌生人（比如同航班邻座、咖啡馆同桌）向你搭话聊天，你的自然反应是？',
+    options: [
+      { score: 1, text: '礼貌回应一句就戴上耳机', emoji: '🎧' },
+      { score: 2, text: '简单聊几句但不会深入', emoji: '👋' },
+      { score: 3, text: '看对方是什么样的人再决定聊不聊', emoji: '👀' },
+      { score: 4, text: '觉得萍水相逢的闲聊挺有意思的', emoji: '😊' },
+      { score: 5, text: '很享受和陌生人随机碰撞出的对话', emoji: '🌟' },
+    ],
+  },
+  {
+    id: 'soc-r2', dimension: 'social', subtopic: Soc.gene, reverse: true,
+    text: '听到一群年轻人在热烈讨论你不了解的新文化现象（比如某个梗/综艺/游戏），你的反应是？',
+    options: [
+      { score: 1, text: '觉得跟我没关系，不关注', emoji: '🤷' },
+      { score: 2, text: '听听他们在说什么但不去了解', emoji: '👂' },
+      { score: 3, text: '如果有机会就顺便了解一下', emoji: '📱' },
+      { score: 4, text: '觉得挺有趣的，会主动问问他们在聊什么', emoji: '❓' },
+      { score: 5, text: '喜欢了解年轻一代关心什么——保持和时代连接很重要', emoji: '🔗' },
+    ],
+  },
+  {
+    id: 'lif-r1', dimension: 'lifestyle', subtopic: Lif.risk, reverse: true,
+    text: '周末早上醒来，发现一整天没有任何安排，你的心情是？',
+    options: [
+      { score: 1, text: '有点焦虑，不知道该干什么', emoji: '😟' },
+      { score: 2, text: '还行，随便找点事做', emoji: '🤷' },
+      { score: 3, text: '自由的感觉，慢慢想做什么', emoji: '😊' },
+      { score: 4, text: '兴奋！空白的一天充满可能', emoji: '🎨' },
+      { score: 5, text: '太好了！就喜欢这种即兴探索的快乐', emoji: '🌟' },
+    ],
+  },
+  {
+    id: 'lif-r2', dimension: 'lifestyle', subtopic: Lif.grow, reverse: true,
+    text: '你发现自己花了一整个下午做了一件"没用但有趣"的事，你的感受是？',
+    options: [
+      { score: 1, text: '懊悔，觉得自己浪费了时间', emoji: '😞' },
+      { score: 2, text: '有点愧疚，但已经做了就算了', emoji: '😅' },
+      { score: 3, text: '偶尔放松一下也挺好', emoji: '😊' },
+      { score: 4, text: '不觉得浪费——快乐本身就是有用的', emoji: '💫' },
+      { score: 5, text: '最好的时光往往就藏在那些"没用"的事里', emoji: '🌿' },
+    ],
+  },
 ];
 
 // ============================================================
@@ -968,8 +1061,8 @@ export const DIMENSION_BRANCHES: Record<Dimension, DimensionBranch> = {
       subtopicGroups: [['cog-h1','cog-h5'], ['cog-h2','cog-h6'], ['cog-h3','cog-h7'], ['cog-h4','cog-h8']],
     },
     branchLow: {
-      questionIds: ['cog-l1','cog-l2','cog-l3','cog-l4','cog-l5','cog-l6','cog-l7','cog-l8'],
-      subtopicGroups: [['cog-l1','cog-l5'], ['cog-l2','cog-l6'], ['cog-l3','cog-l7'], ['cog-l4','cog-l8']],
+      questionIds: ['cog-l1','cog-l2','cog-l3','cog-l4','cog-l5','cog-l6','cog-l7','cog-l8','cog-r1','cog-r2'],
+      subtopicGroups: [['cog-l1','cog-l5'], ['cog-l2','cog-l6','cog-r1'], ['cog-l3','cog-l7'], ['cog-l4','cog-l8','cog-r2']],
     },
     branchThreshold: 13,
   },
@@ -980,8 +1073,8 @@ export const DIMENSION_BRANCHES: Record<Dimension, DimensionBranch> = {
       subtopicGroups: [['emo-h1','emo-h5'], ['emo-h2','emo-h6'], ['emo-h3','emo-h7'], ['emo-h4','emo-h8']],
     },
     branchLow: {
-      questionIds: ['emo-l1','emo-l2','emo-l3','emo-l4','emo-l5','emo-l6','emo-l7','emo-l8'],
-      subtopicGroups: [['emo-l1','emo-l5'], ['emo-l2','emo-l6'], ['emo-l3','emo-l7'], ['emo-l4','emo-l8']],
+      questionIds: ['emo-l1','emo-l2','emo-l3','emo-l4','emo-l5','emo-l6','emo-l7','emo-l8','emo-r1','emo-r2'],
+      subtopicGroups: [['emo-l1','emo-l5'], ['emo-l2','emo-l6','emo-r1'], ['emo-l3','emo-l7','emo-r2'], ['emo-l4','emo-l8']],
     },
     branchThreshold: 13,
   },
@@ -992,8 +1085,8 @@ export const DIMENSION_BRANCHES: Record<Dimension, DimensionBranch> = {
       subtopicGroups: [['soc-h1','soc-h5'], ['soc-h2','soc-h6'], ['soc-h3','soc-h7'], ['soc-h4','soc-h8']],
     },
     branchLow: {
-      questionIds: ['soc-l1','soc-l2','soc-l3','soc-l4','soc-l5','soc-l6','soc-l7','soc-l8'],
-      subtopicGroups: [['soc-l1','soc-l5'], ['soc-l2','soc-l6'], ['soc-l3','soc-l7'], ['soc-l4','soc-l8']],
+      questionIds: ['soc-l1','soc-l2','soc-l3','soc-l4','soc-l5','soc-l6','soc-l7','soc-l8','soc-r1','soc-r2'],
+      subtopicGroups: [['soc-l1','soc-l5','soc-r1'], ['soc-l2','soc-l6'], ['soc-l3','soc-l7','soc-r2'], ['soc-l4','soc-l8']],
     },
     branchThreshold: 13,
   },
@@ -1004,8 +1097,8 @@ export const DIMENSION_BRANCHES: Record<Dimension, DimensionBranch> = {
       subtopicGroups: [['lif-h1','lif-h5'], ['lif-h2','lif-h6'], ['lif-h3','lif-h7'], ['lif-h4','lif-h8']],
     },
     branchLow: {
-      questionIds: ['lif-l1','lif-l2','lif-l3','lif-l4','lif-l5','lif-l6','lif-l7','lif-l8'],
-      subtopicGroups: [['lif-l1','lif-l5'], ['lif-l2','lif-l6'], ['lif-l3','lif-l7'], ['lif-l4','lif-l8']],
+      questionIds: ['lif-l1','lif-l2','lif-l3','lif-l4','lif-l5','lif-l6','lif-l7','lif-l8','lif-r1','lif-r2'],
+      subtopicGroups: [['lif-l1','lif-l5','lif-r1'], ['lif-l2','lif-l6'], ['lif-l3','lif-l7'], ['lif-l4','lif-l8','lif-r2']],
     },
     branchThreshold: 13,
   },
@@ -1024,20 +1117,15 @@ export const TOTAL_BANK_SIZE = questionDefs.length;
 /** 单次测试总题数（16 基准 + 16 分支 = 32） */
 export const QUESTIONS_PER_TEST = 32;
 
-/** 累计一个维度已答题总分（用于计算分支，仅基准题） */
-export function getDimensionRunningScore(
-  answers: Record<string, number>,
-  dimension: Dimension
-): number {
-  const branch = DIMENSION_BRANCHES[dimension];
-  let score = 0;
-  for (const id of branch.baseline) {
-    score += answers[id] ?? 0;
+/** 获取答案的实际分值（处理反向计分） */
+function getEffectiveScore(id: string, rawScore: number): number {
+  const q = questionMap[id];
+  if (q?.reverse) {
+    return 6 - rawScore; // flip: 1↔5, 2↔4, 3 stays
   }
-  return score;
+  return rawScore;
 }
 
-/** 计算一个维度所有已答题的总分 */
 export function getDimensionTotalScore(
   answers: Record<string, number>,
   dimension: Dimension
@@ -1050,9 +1138,28 @@ export function getDimensionTotalScore(
     ...branch.branchLow.questionIds,
   ];
   for (const id of allIds) {
-    total += answers[id] ?? 0;
+    const raw = answers[id];
+    if (raw !== undefined) {
+      total += getEffectiveScore(id, raw);
+    }
   }
   return total;
+}
+
+/** 累计每维度基准题总分（用于分支判断，也处理反向计分） */
+export function getDimensionRunningScore(
+  answers: Record<string, number>,
+  dimension: Dimension
+): number {
+  const branch = DIMENSION_BRANCHES[dimension];
+  let score = 0;
+  for (const id of branch.baseline) {
+    const raw = answers[id];
+    if (raw !== undefined) {
+      score += getEffectiveScore(id, raw);
+    }
+  }
+  return score;
 }
 
 /** calculate.ts 兼容 */

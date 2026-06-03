@@ -20,7 +20,8 @@ const DIM_CONTEXTS: Record<Dimension, string> = {
 // 年龄映射
 // ============================================================
 function mapToAge(rawScore: number): number {
-  return Math.round(15 + ((rawScore - 8) / (40 - 8)) * (60 - 15));
+  // rawScore: 8-40, maps to age 8-72
+  return Math.round(8 + ((rawScore - 8) / (40 - 8)) * (72 - 8));
 }
 
 function mapToPercentage(rawScore: number): number {
@@ -37,7 +38,7 @@ function baseDimAnalysis(dimension: Dimension, mentalAge: number): {
   strength: string;
   suggestion: string;
 } {
-  if (mentalAge >= 50) {
+  if (mentalAge >= 56) {
     const t: Record<Dimension, { analysis: string; strength: string; suggestion: string }> = {
       cognitive: {
         analysis: '你在认知方面表现出高度的系统性和元认知能力——不仅分析问题本身，还会审视自己的分析框架是否合理。面对复杂问题时，你会从多个角度综合考量后再做判断。',
@@ -63,7 +64,7 @@ function baseDimAnalysis(dimension: Dimension, mentalAge: number): {
     return t[dimension];
   }
 
-  if (mentalAge >= 38) {
+  if (mentalAge >= 44) {
     const t: Record<Dimension, { analysis: string; strength: string; suggestion: string }> = {
       cognitive: {
         analysis: '你处理信息的方式偏向谨慎和系统化。面对相反观点时，你会尝试理解对方的推理过程，即使不认同也能看到其中的合理成分。',
@@ -89,7 +90,7 @@ function baseDimAnalysis(dimension: Dimension, mentalAge: number): {
     return t[dimension];
   }
 
-  if (mentalAge >= 24) {
+  if (mentalAge >= 28) {
     const t: Record<Dimension, { analysis: string; strength: string; suggestion: string }> = {
       cognitive: {
         analysis: '你的认知风格在直觉和理性之间保持了良好平衡。日常小事凭经验快速判断，重要决策则会多角度分析。你能根据情境灵活切换思维深度。',
@@ -115,7 +116,7 @@ function baseDimAnalysis(dimension: Dimension, mentalAge: number): {
     return t[dimension];
   }
 
-  // mentalAge < 24
+  // mentalAge < 28
   const t: Record<Dimension, { analysis: string; strength: string; suggestion: string }> = {
     cognitive: {
       analysis: '你的思维灵活且开放，对新鲜事物抱有强烈好奇心。你倾向于边做边学，喜欢直接上手尝试。你的直觉和快速反应让你在变化中如鱼得水。',
@@ -143,10 +144,10 @@ function baseDimAnalysis(dimension: Dimension, mentalAge: number): {
 
 /** 根据绝对心理年龄生成 headline */
 function baseHeadline(mentalAge: number): string {
-  if (mentalAge >= 52) return '你的心理年龄非常成熟，拥有岁月沉淀的智慧';
-  if (mentalAge >= 42) return '你的心理年龄偏向成熟稳重';
-  if (mentalAge >= 30) return '你的心理年龄处于成熟与年轻之间的平衡点';
-  if (mentalAge >= 22) return '你的心理年龄偏向年轻活力';
+  if (mentalAge >= 58) return '你的心理年龄非常成熟，拥有岁月沉淀的智慧';
+  if (mentalAge >= 48) return '你的心理年龄偏向成熟稳重';
+  if (mentalAge >= 36) return '你的心理年龄处于成熟与年轻之间的平衡点';
+  if (mentalAge >= 24) return '你的心理年龄偏向年轻活力';
   return '你的心理年龄非常年轻，充满青春的好奇与热情';
 }
 
@@ -157,13 +158,13 @@ function baseSummary(mentalAge: number, dims: DimensionResult[]): string {
   const lowest = sorted[sorted.length - 1];
 
   let summary = `你的综合心理年龄为 ${mentalAge} 岁。`;
-  if (mentalAge >= 50) {
+  if (mentalAge >= 56) {
     summary += '你在多个维度上表现出高度的成熟和系统性思维。';
-  } else if (mentalAge >= 38) {
+  } else if (mentalAge >= 44) {
     summary += '你在认知、情感和生活中表现出较为成熟的特质。';
-  } else if (mentalAge >= 30) {
+  } else if (mentalAge >= 36) {
     summary += '你在成熟与年轻之间保持了良好的平衡。';
-  } else if (mentalAge >= 22) {
+  } else if (mentalAge >= 24) {
     summary += '你拥有灵活的思维和年轻的心态，充满探索精神。';
   } else {
     summary += '你拥有一颗非常年轻的心，对世界保持着旺盛的好奇和热情。';
@@ -447,9 +448,9 @@ function detectPatterns(
   const sorted = [...dims].sort((a, b) => b.mentalAge - a.mentalAge);
 
   // Pattern 1: all dimensions consistently high or low
-  const allHigh = dims.every((d) => d.mentalAge >= 45);
-  const allLow = dims.every((d) => d.mentalAge <= 25);
-  const allMid = dims.every((d) => d.mentalAge >= 26 && d.mentalAge <= 44);
+  const allHigh = dims.every((d) => d.mentalAge >= 50);
+  const allLow = dims.every((d) => d.mentalAge <= 20);
+  const allMid = dims.every((d) => d.mentalAge >= 21 && d.mentalAge <= 49);
 
   if (allHigh) {
     patterns.push('你在四个维度上的心理年龄都处于高位，说明你的"成熟"是全方位的——从思维方式到生活习惯，都透着一股稳重。这不是一朝一夕形成的，而是你长期自我打磨的结果。');
